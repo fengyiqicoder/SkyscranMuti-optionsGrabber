@@ -5,7 +5,9 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from time import sleep
+
 def getPrice(startDate):
+    cheapestPrice = 19999
     for timeLongth in range(6,8):
         driver = webdriver.Chrome()
         endDate = startDate + timeLongth
@@ -27,6 +29,10 @@ def getPrice(startDate):
             price = div.find("p",class_="price-black").find("b").get_text()
             #组织信息
             result = price
+            priceNumber = int(price[1:])
+            # print(priceNumber)
+            if cheapestPrice > priceNumber and changeFilghtTimes == 0:
+                cheapestPrice = priceNumber
             if (needToChangeFilght):
                 result += "[转机 " + str(changeFilghtTimes) + "次]"
             result += "{去程} 起飞时间 2019-08-"+str(startDate) + " " + timePointList[0] + " " + companyList[0] + " 航班 " + "到达时间 2019-08-"+str(startDate) + " "+ timePointList[1] + " 飞行时长" + durationTimeList[0] + ""
@@ -41,6 +47,8 @@ def getPrice(startDate):
         print("返回日期 08-"+str(endDate))
         for string in thisDatesResult:
             print(string)
+
+    return cheapestPrice
 def getAllText(dic):
     result = []
     for element in dic:
@@ -49,5 +57,11 @@ def getAllText(dic):
 
 
 if __name__ == "__main__":
-    for startDate in range(15,23):
-        getPrice(startDate)
+    cheapestPrice = 19999
+    for startDate in range(15,24):
+        price = getPrice(startDate)
+        if cheapestPrice > price:
+            cheapestPrice = price
+
+    print("最便宜的价钱 ")
+    print(cheapestPrice)
