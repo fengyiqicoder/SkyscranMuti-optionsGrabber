@@ -8,6 +8,7 @@ from time import sleep
 lowersPriceList = []
 def getPrice(startDate,startPlace):
     cheapestPrice = 19999
+    #这里添加不同的返回日期
     for timeLongth in range(6,8):
         driver = webdriver.Chrome()
         endDate = startDate + timeLongth
@@ -62,6 +63,7 @@ def getAllText(dic):
 def checkPriceStartAt(city):
     cheapestPrice = 19999
     lowersPriceList.clear()
+    #这里添加不同的出发日期
     for startDate in range(15,25):
         price = getPrice(startDate,city)
         if cheapestPrice > price:
@@ -74,6 +76,7 @@ def checkPriceStartAt(city):
     print("------------------------------------------")
 
 if __name__ == "__main__":
+    #在这里添加不同的目的地
     checkPriceStartAt("cxmn")
     checkPriceStartAt("hkga")
     checkPriceStartAt("csha")
