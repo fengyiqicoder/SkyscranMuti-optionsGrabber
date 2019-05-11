@@ -1,4 +1,3 @@
-from selenium import webdriver
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -6,14 +5,15 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from time import sleep
 
-def getPrice(startDate):
+lowersPriceList = []
+def getPrice(startDate,startPlace):
     cheapestPrice = 19999
     for timeLongth in range(6,8):
         driver = webdriver.Chrome()
         endDate = startDate + timeLongth
         # WebDriverWait(driver,20)
         # driver.implicitly_wait(30)
-        driver.get("https://www.tianxun.com/intl-round-cxmn-tyoa.html?depdate=2019-08-"+str(startDate)+"&rtndate=2019-08-"+str(endDate)+"&cabin=Economy&adult=6&child=0&infant=0")
+        driver.get("https://www.tianxun.com/intl-round-" + startPlace + "-tyoa.html?depdate=2019-08-"+str(startDate)+"&rtndate=2019-08-"+str(endDate)+"&cabin=Economy&adult=6&child=0&infant=0")
         sleep(10)
         # print("wake up")
         html_source = driver.page_source
@@ -31,13 +31,14 @@ def getPrice(startDate):
             result = price
             priceNumber = int(price[1:])
             # print(priceNumber)
-            if cheapestPrice > priceNumber and changeFilghtTimes == 0:
-                cheapestPrice = priceNumber
             if (needToChangeFilght):
                 result += "[转机 " + str(changeFilghtTimes) + "次]"
             result += "{去程} 起飞时间 2019-08-"+str(startDate) + " " + timePointList[0] + " " + companyList[0] + " 航班 " + "到达时间 2019-08-"+str(startDate) + " "+ timePointList[1] + " 飞行时长" + durationTimeList[0] + ""
             result += "{回程} 起飞时间 2019-08-"+str(endDate) + " "  + timePointList[2] + " " + companyList[len(companyList)-1] + " 航班 "  + "到达时间 2019-08-"+str(endDate) + " " + timePointList[3] + "飞行时长" + durationTimeList[1] + "   "
-            #输出
+            #检查是否是最便宜的
+            if cheapestPrice > priceNumber and changeFilghtTimes == 0:
+                cheapestPrice = priceNumber
+            #添加result
             if (len(thisDatesResult)<=5):
                 thisDatesResult.append(result)
             else:
@@ -47,7 +48,9 @@ def getPrice(startDate):
         print("返回日期 08-"+str(endDate))
         for string in thisDatesResult:
             print(string)
-
+        #价钱排序
+        lowersPriceList.append(cheapestPrice)
+        lowersPriceList.sort()
     return cheapestPrice
 def getAllText(dic):
     result = []
@@ -56,12 +59,21 @@ def getAllText(dic):
     return result
 
 
-if __name__ == "__main__":
+def checkPriceStartAt(city):
     cheapestPrice = 19999
-    for startDate in range(15,24):
-        price = getPrice(startDate)
+    lowersPriceList.clear()
+    for startDate in range(15,25):
+        price = getPrice(startDate,city)
         if cheapestPrice > price:
             cheapestPrice = price
-
-    print("最便宜的价钱 ")
+    print("------------------------------------------")
+    print("从" + city + "最便宜的直飞价钱 ")
     print(cheapestPrice)
+    print("从" + city + "所有日期的直飞价格排序")
+    print(lowersPriceList)
+    print("------------------------------------------")
+
+if __name__ == "__main__":
+    checkPriceStartAt("cxmn")
+    checkPriceStartAt("hkga")
+    checkPriceStartAt("csha")
